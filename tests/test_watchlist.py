@@ -8,7 +8,11 @@ Follows the same fixture and assertion patterns as tests/test_collection.py.
 import pytest
 from app import create_app, db
 from models import User, Film, WatchlistEntry
-from services.watchlist_service import add_to_watchlist, AlreadyInWatchlistError
+from services.watchlist_service import (
+    add_to_watchlist,
+    get_watchlist,
+    AlreadyInWatchlistError,
+)
 from services.collection_service import FilmNotFoundError
 
 
@@ -89,6 +93,37 @@ def test_add_to_watchlist_respects_explicit_private(app, sample_user, sample_fil
         )
 
         assert entry.public is False
+
+
+# ── get_watchlist sort order ─────────────────────────────────────────────────
+
+def test_get_watchlist_returns_newest_first(app, sample_user):
+    """
+    get_watchlist() should return films sorted by date_added descending
+    (most recently added first), consistent with get_collection().
+    """
+    with app.app_context():
+        from datetime import datetime, timezone, timedelta
+
+        film_a = Film(title="Alien", year=1979, genre="Horror")
+        film_b = Film(title="Blade Runner", year=1982, genre="Sci-Fi")
+        db.session.add_all([film_a, film_b])
+        db.session.commit()
+
+        earlier = datetime.now(timezone.utc) - timedelta(days=5)
+        later = datetime.now(timezone.utc)
+
+        entry_a = WatchlistEntry(user_id=sample_user, film_id=film_a.id, date_added=earlier)
+        entry_b = WatchlistEntry(user_id=sample_user, film_id=film_b.id, date_added=later)
+        db.session.add_all([entry_a, entry_b])
+        db.session.commit()
+
+        watchlist = get_watchlist(sample_user)
+        titles = [f["title"] for f in watchlist]
+
+        # Blade Runner was added later, so it should come first
+        assert titles[0] == "Blade Runner"
+        assert titles[1] == "Alien"
 
 
 # ── Nonexistent film ─────────────────────────────────────────────────────────
