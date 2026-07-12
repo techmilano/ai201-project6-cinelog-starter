@@ -66,6 +66,31 @@ def test_add_to_watchlist_duplicate_raises(app, sample_user, sample_film):
         assert count == 1
 
 
+# ── Visibility default ───────────────────────────────────────────────────────
+
+def test_add_to_watchlist_defaults_to_public(app, sample_user, sample_film):
+    """
+    Omitting the public flag should leave the entry publicly visible,
+    preserving CineLog's community-discovery default.
+    """
+    with app.app_context():
+        entry = add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        assert entry.public is True
+
+
+def test_add_to_watchlist_respects_explicit_private(app, sample_user, sample_film):
+    """
+    Passing public=False should create a private (non-public) entry.
+    """
+    with app.app_context():
+        entry = add_to_watchlist(
+            user_id=sample_user, film_id=sample_film, public=False
+        )
+
+        assert entry.public is False
+
+
 # ── Nonexistent film ─────────────────────────────────────────────────────────
 
 def test_add_to_watchlist_nonexistent_film_raises(app, sample_user):
