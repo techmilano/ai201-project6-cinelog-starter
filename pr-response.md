@@ -156,7 +156,7 @@ request body, allowing callers to create a private entry with `{"public": false}
 
 ```
 $ pytest tests/ -v
-9 passed
+11 passed
 
 $ python -m compileall app.py models.py services routes tests
 (no syntax errors)
@@ -187,7 +187,9 @@ watched collection. It introduces the `WatchlistEntry` model and two service
 functions, `add_to_watchlist()` and `get_watchlist()`, exposed through
 `POST /watchlist/<user_id>/add` and `GET /watchlist/<user_id>`. Adding a film
 that is already saved raises `AlreadyInWatchlistError`; adding an unknown film
-raises `FilmNotFoundError`.
+raises `FilmNotFoundError`. The stretch implementation also adds
+`remove_from_watchlist()` and exposes it through
+`DELETE /watchlist/<user_id>/remove`.
 
 **Visibility decision**
 `public` defaults to `True` (community-visible), consistent with CineLog's
