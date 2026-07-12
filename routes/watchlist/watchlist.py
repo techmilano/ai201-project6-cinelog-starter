@@ -23,7 +23,7 @@ def add_film(user_id):
     """
     POST /watchlist/<user_id>/add
 
-    Body: { "film_id": <int>, "public": <bool, optional> }
+    Body: { "film_id": <uuid str>, "public": <bool, optional> }
 
     "public" defaults to True (community-visible) when omitted.
     """
