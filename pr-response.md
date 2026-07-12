@@ -135,9 +135,12 @@ integer assumptions remain, and the merge-commit query returned no results.
 ## Stretch Features
 
 ### remove_from_watchlist()
-Not implemented in this PR. It is a natural follow-up that would mirror
-`remove_from_collection()` (raising a `NotInWatchlistError` when the entry is
-absent) and can be added in a separate change.
+Implemented as an optional stretch feature. `remove_from_watchlist()` mirrors
+`remove_from_collection()`: it deletes the matching entry and raises
+`NotInWatchlistError` when the film is not on the user's watchlist. It is exposed
+via `DELETE /watchlist/<user_id>/remove` (returns 404 on `NotInWatchlistError`)
+and covered by happy-path and not-in-watchlist tests. This was beyond the
+required review comments and could equally have shipped as a follow-up PR.
 
 ### Additional edge-case test
 Implemented. Beyond the required nonexistent-film test, `tests/test_watchlist.py`
